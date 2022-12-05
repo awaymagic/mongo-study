@@ -1,6 +1,7 @@
 package com.example.mongo;
 
 import com.example.mongo.entity.User;
+import com.mongodb.client.result.UpdateResult;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.data.domain.Sort;
@@ -8,6 +9,7 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.BasicQuery;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
 
 import javax.annotation.Resource;
 import java.util.Arrays;
@@ -111,6 +113,36 @@ public class MongoStudyTests extends MongoStudyApplicationTests {
 
         List<User> users = mongoTemplate.find(query, User.class);
         users.forEach(System.out::println);
+
+    }
+    @Test
+    @DisplayName("文档更新")
+    public void testUpdate(){
+
+        Update update = new Update();
+        // setOnInsert 插入数据指定参数
+        // update.setOnInsert("id", 10);
+        update.set("salary", 1);
+        // 更新符合条件的第一条
+        // mongoTemplate.updateFirst(Query.query(Criteria.where("salary").is(1500.0)), update, User.class);
+        // 更新符合条件的多条
+        // mongoTemplate.updateMulti(Query.query(Criteria.where("salary").is(1999.9)), update, User.class);
+        // 没有符合条件数据插入数据
+        UpdateResult updateResult = mongoTemplate.upsert(Query.query(Criteria.where("salary").is(1999.9)), update, User.class);
+        System.out.println(updateResult.getModifiedCount());
+        System.out.println(updateResult.getMatchedCount());
+        System.out.println(updateResult.getUpsertedId());
+
+    }
+    @Test
+    @DisplayName("文档删除")
+    public void testDelete(){
+
+        // 条件删除
+        mongoTemplate.remove(Query.query(Criteria.where("name").is("睡觉")), User.class);
+
+        // 删除所有
+        // mongoTemplate.remove(new Query(), User.class);
 
     }
 
